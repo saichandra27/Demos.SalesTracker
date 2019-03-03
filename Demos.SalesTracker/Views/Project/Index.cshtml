@@ -1,0 +1,69 @@
+﻿
+@{
+    ViewBag.Title = "Project";
+}
+
+<h2>Project</h2>
+
+<script type="text/javascript">
+    var salestrackerapp = angular.module('salestrackerapp', ['ui.grid', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.moveColumns']);
+
+    salestrackerapp.controller('ProjectController', function ($scope, $http) {
+        var vm = this;
+        vm.gridOptions = {
+            
+        };
+        vm.gridOptions.columnDefs = [
+            { name: 'Title' },
+            { name: 'Region' },
+            { name: 'SubRegion', displayName: 'Sub Region' },
+            { name: 'ProjectDocument.ProjectTitle', displayName: 'Project Documents', type: 'object' },
+            { name: 'SuportingDocument.ProjectTitle', displayName: 'Suporting Documents', type: 'object' },
+            { name: 'Edit', cellTemplate: '<div><a href="http://stackoverflow.com">Edit</a></div>', width: '5%' },
+            { name: 'Delete', cellTemplate: '<div><a href="http://stackoverflow.com">Delete</a></div>', width: '5%' }
+        ];
+
+        $http.get('/Project/Project_Read').then(successCallback, errorCallback);
+        function successCallback(response) {
+            var data = response.data;
+            vm.gridOptions.data = data
+        }
+        function errorCallback(error) {
+            console.log(error);
+        }
+
+        vm.msg = {};
+
+        vm.gridOptions.onRegisterApi = function (gridApi) {
+            //set gridApi on scope
+            vm.gridApi = gridApi;
+            gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
+                //vm.msg.lastCellEdited = 'edited row id:' + rowEntity.Id + ' Column:' + colDef.name + ' newValue:' + newValue + ' oldValue:' + oldValue;
+
+                vm.msg.lastCellEdited = "the field   " + colDef.name + ' is succesfully updated to ' + newValue;
+
+                //$http.get('/Project/Edit').then(successCallback, errorCallback);
+
+                $http.post('/Project/Edit', { 'Id': rowEntity.Id, 'Project': rowEntity }).then(successCallback, errorCallback);
+                function successCallback(response) {
+                    //  var data = response.data;
+                    //vm.gridOptions.data = data
+                }
+                function errorCallback(error) {
+                    console.log(error);
+                }
+
+                $scope.$apply();
+            });
+        };
+
+    });
+</script>
+
+<div ng-app="salestrackerapp">
+    <div ng-controller="ProjectController as $ctrl">
+        <div ui-grid="$ctrl.gridOptions" ui-grid-edit class="myGrid" ui-grid-resize-columns ui-grid-move-columns></div>
+        <strong>Last Cell Edited:</strong> {{$ctrl.msg.lastCellEdited}}
+    </div>
+</div>
+

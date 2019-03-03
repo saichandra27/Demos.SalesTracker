@@ -1,0 +1,65 @@
+﻿
+@model Demos.SalesTracker.Models.UserViewModel
+@{
+    ViewBag.Title = "EmployeeInfo";
+}
+
+<div id="employeeinfocontainer" style="margin-left:20px" ng-app="salestrackerapp" ng-controller="ProjectController" class="agcontainer">
+    <div class="row">
+        <div class="col-50-left">
+            <label>User Name:</label>
+            @Html.DisplayFor(modelItem => Model.UserName)
+        </div>
+        <div class="col-50-right">
+            <label>Email Id:</label>
+            @Html.DisplayFor(modelItem => Model.EmailId)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-50-left">
+            <label>Designation</label>
+            @Html.DisplayFor(modelItem => Model.Designation)
+        </div>
+        <div class="col-50-right">
+            <label>Department:</label>
+            @Html.DisplayFor(modelItem => Model.Department)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-50-left">
+            <label>Reporting Manager:</label>
+            @Html.DisplayFor(modelItem => Model.ReportingManager)
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var salestrackerapp = angular.module('salestrackerapp', []);
+    salestrackerapp.controller('ProjectController', function ($scope, $http) {
+        $http.get('/Project/GetUserInfo').then(successUserInfoCallback, errorUserInfoCallback);
+        function successUserInfoCallback(response) {
+            $scope.UserInfo = response.data;
+        }
+        function errorUserInfoCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetProjectDocument').then(successSubRegionCallback, errorSubRegionCallback);
+        function successSubRegionCallback(response) {
+            $scope.ProjectDocument = response.data;
+            $scope.selectedProjectDocument = $scope.ProjectDocument[documentid];
+        }
+        function errorSubRegionCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetSupportingDocument').then(successSubRegionCallback, errorSubRegionCallback);
+        function successSubRegionCallback(response) {
+            $scope.ProjectDocument = response.data;
+            $scope.selectedProjectDocument = $scope.ProjectDocument[documentid];
+        }
+        function errorSubRegionCallback(error) {
+            console.log(error);
+        }
+    });
+</script>

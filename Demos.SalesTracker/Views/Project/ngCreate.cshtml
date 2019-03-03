@@ -1,0 +1,391 @@
+﻿<div class="agcontainer" ng-app="salestrackerapp" ng-controller="ProjectController">
+    <h3>Employee Info</h3>
+    <div id="employeeinfocontainer" style="margin-left:20px">
+        <div class="row">
+            <div class="col-50-left">
+                <label>User Name:</label>
+                <label>{{UserInfo.UserName}}</label>
+            </div>
+            <div class="col-50-right">
+                <label>Email Id:</label>
+                <label>{{UserInfo.EmailId}}</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-50-left">
+                <label>Designation</label>
+                <label>{{UserInfo.Designation}}</label>
+            </div>
+            <div class="col-50-right">
+                <label>Department:</label>
+                <label>{{UserInfo.Department}}</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-50-left">
+                <label>Reporting Manager:</label>
+                <label>{{UserInfo.ReportingManager}}</label>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <h3> Project Info</h3>
+    <div id="projectinfocontainer" style="margin-left:20px">
+        <div class="row">
+            <div class="col-25">
+                <label>Project Title:</label>
+            </div>
+            <div class="col-75">
+                <input type="text" ng-model="ProjectTitle" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+                <label>Project Technology:</label>
+            </div>
+            <div class="col-75">
+                <input type="text" ng-model="ProjectTechnology" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-25">
+                <label>Client Name:</label>
+            </div>
+            <div class="col-75">
+                <input type="text" ng-model="ClientName" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+                <label>Client Industry:</label>
+            </div>
+            <div class="col-75">
+                <input type="text" ng-model="ClientIndustry" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+                <label>Client Region:</label>
+            </div>
+            <div class="col-75">
+                <select id="region" ng-options="region.Title for region in Region" ng-model="selectedRegion"></select>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+                <label>Client Sub Region:</label>
+            </div>
+            <div class="col-75">
+                <select id="subregion" ng-options="subregion.Title for subregion in SubRegion" ng-model="selectedSubRegion"></select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-25">
+                <label>Project Status:</label>
+            </div>
+            <div class="col-75">
+                <label>
+                    <input name="status" type="radio" ng-model="color.name" ng-value="specialValue">
+                    Open
+                    <input name="status" type="radio" ng-model="color.name" ng-value="specialValue">
+                    Closed
+                </label>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <h3>Documents Section</h3>
+    <div id="ProjectDocumentsSection" style="margin-left:20px">
+        <div class="row">
+            <label>Project Documents:</label>
+        </div>
+        <div class="row">
+            <div class="col-50-left">
+                <label>Upload Document</label>  <br />
+                <input id="projectdocs" type="file" multiple="multiple" ngf-select="UploadFiles($files)" />
+                <br />
+                <br />
+                Files:
+                <ul>
+                    <li ng-repeat="file in SelectedFiles">{{file.name}}</li>
+                </ul>
+                <div class="progress" ng-show="Progress >= 0">
+                    <div style="width: {{Progress}}%" ng-bind="Progress + '%'">
+                    </div>
+                </div>
+                <br />
+                <b>OR</b>  <br />
+                <label>Choose From Existing Documents</label>   <br />
+                <label>
+                    File Name:
+                    @*<select ng-model="selectedProjectDocument">
+                            <option ng-repeat="option in ProjectDocument" value="{{option.Id}}">{{option.Title}}</option>
+                        </select>*@
+                    <select multiple="multiple" ng-model="selectedpdoc" ng-options="pdoc.Id as pdoc.Title for pdoc in ProjectDocument"></select>
+                </label>
+            </div>
+            <div class="col-50-right">
+                <label>Supporting Documents:</label>
+                <label>Upload Document</label>  <br />
+                <input id="projectdocs" type="file" multiple="multiple" ngf-select="UploadFiles1($files)" />
+                <br />
+                <br />
+                Files:
+                <ul>
+                    <li ng-repeat="file in SelectedFiles1">{{file.name}}</li>
+                </ul>
+                <div class="progress" ng-show="Progress1 >= 0">
+                    <div style="width: {{Progress1}}%" ng-bind="Progress1 + '%'">
+                    </div>
+                </div>
+                <br />
+                <b>OR</b>  <br />
+                <label>Choose From Existing Documents</label>   <br />
+                <label>
+                    File Name:
+                    <select multiple="multiple" ng-model="selectedspdoc" ng-options="spdoc.Id as spdoc.Title for spdoc in SupportingDocument"></select>
+                </label>
+                <br />
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div style="float:right">
+            <input type="button" ng-click="AddProject()" value="Create" class="btn btn-default" />
+            <input type="button" value="Cancel" class="btn btn-default" />
+            <input type="button" value="Get" ng-click="GetSupportingdocsValue()" />
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var msg = ""; var regionId = 0; var subregionId = 0; var documentid = 0;
+    var salestrackerapp = angular.module('salestrackerapp', ['ngFileUpload']);
+
+    salestrackerapp.controller('ProjectController', function ($scope, $http, Upload, $timeout, $window) {
+
+        $http.get('/Project/GetRegions').then(successRegionCallback, errorRegionCallback);
+        function successRegionCallback(response) {
+            $scope.Region = response.data;
+            $scope.selectedRegion = "1";
+        }
+        function errorRegionCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetSubRegions').then(successSubRegionCallback, errorSubRegionCallback);
+        function successSubRegionCallback(response) {
+            $scope.SubRegion = response.data;
+            $scope.selectedSubRegion = "1";
+        }
+        function errorSubRegionCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetProjectDocument').then(successProjectDocumentCallback, errorProjectDocumentCallback);
+        function successProjectDocumentCallback(response) {
+            $scope.ProjectDocument = response.data;
+            $scope.selectedpdoc = 1;
+        }
+        function errorProjectDocumentCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetSupportingDocument').then(successSupportingDocumentCallback, errorSupportingDocumentCallback);
+        function successSupportingDocumentCallback(response) {
+            $scope.SupportingDocument = response.data;
+            $scope.selectedspdoc = 1;
+        }
+        function errorSupportingDocumentCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetUserInfo').then(successUserInfoCallback, errorUserInfoCallback);
+        function successUserInfoCallback(response) {
+            $scope.UserInfo = response.data;
+        }
+        function errorUserInfoCallback(error) {
+            console.log(error);
+        }
+
+
+
+        $scope.UploadFiles = function (files) {
+            $scope.SelectedFiles = files;
+            if ($scope.SelectedFiles && $scope.SelectedFiles.length) {
+                Upload.upload({
+                    url: '/Project/SaveProjectDoc/',
+                    data: {
+                        files: $scope.SelectedFiles
+                    }
+                }).then(function (response) {
+                    $timeout(function () {
+                        $scope.Result = response.data;
+                    });
+                }, function (response) {
+                    if (response.status > 0) {
+                        var errorMsg = response.status + ': ' + response.data;
+                        alert(errorMsg);
+                    }
+                }, function (evt) {
+                    $scope.Progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                });
+            }
+
+            window.setTimeout(function () {
+                $http.get('/Project/GetProjectDocument').then(successProjectDocumentCallback1, errorProjectDocumentCallback1);
+                function successProjectDocumentCallback1(response) {
+                    $scope.ProjectDocument = response.data;
+                    $scope.selectedProjectDocument = 1;
+                }
+                function errorProjectDocumentCallback1(error) {
+                    console.log(error);
+                }
+            }, 500);
+        }
+
+        $scope.UploadFiles1 = function (files) {
+            $scope.SelectedFiles1 = files;
+            if ($scope.SelectedFiles1 && $scope.SelectedFiles1.length) {
+                Upload.upload({
+                    url: '/Project/SaveSupooritngDoc/',
+                    data: {
+                        files: $scope.SelectedFiles1
+                    }
+                }).then(function (response) {
+                    $timeout(function () {
+                        $scope.Result1 = response.data;
+                    });
+                }, function (response) {
+                    if (response.status > 0) {
+                        var errorMsg = response.status + ': ' + response.data;
+                        alert(errorMsg);
+                    }
+                }, function (evt) {
+                    $scope.Progress1 = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                });
+            }
+
+            window.setTimeout(function () {
+                $http.get('/Project/GetSupportingDocument').then(successSupportingDocumentCallback1, errorSupportingDocumentCallback1);
+                function successSupportingDocumentCallback1(response) {
+                    $scope.SupportingDocument = response.data;
+                    $scope.selectedSupportingDocument = 1;
+                }
+                function errorSupportingDocumentCallback1(error) {
+                    console.log(error);
+                }
+            }, 500);
+        }
+
+        var projectFile = []; var supportingFile = [];
+
+        $scope.GetProjectdocsValue = function () {
+            var message = "";
+            for (var i = 0; i < $scope.selectedpdoc.length; i++) {
+                var pdocId = $scope.selectedpdoc[i];
+                var pdocName = $.grep($scope.ProjectDocument, function (spdoc) {
+                    return pdoc.Id == pdocId;
+                })[0].Title;
+                message += "Value: " + spdocId + " Text: " + spdocName + "\n";
+                projectFile.push(pdocId);
+            }
+        }
+
+        $scope.GetSupportingdocsValue = function () {
+            var message = "";
+            for (var i = 0; i < $scope.selectedspdoc.length; i++) {
+                var spdocId = $scope.selectedspdoc[i];
+                var spdocName = $.grep($scope.SupportingDocument, function (spdoc) {
+                    return spdoc.Id == spdocId;
+                })[0].Title;
+                message += "Value: " + spdocId + " Text: " + spdocName + "\n";
+                supportingFile.push(spdocId);
+                $window.alert(message);
+            }
+        }
+
+        $scope.AddProject = function () {
+            var message = "";
+            for (var i = 0; i < $scope.selectedpdoc.length; i++) {
+                var pdocId = $scope.selectedpdoc[i];
+                var pdocName = $.grep($scope.ProjectDocument, function (pdoc) {
+                    return pdoc.Id == pdocId;
+                })[0].Title;
+                message += "Value: " + pdocId + " Text: " + pdocName + "\n";
+                projectFile.push(pdocId); 
+            }
+
+            $window.alert(message);
+
+            for (var i = 0; i < $scope.selectedspdoc.length; i++) {
+                var spdocId = $scope.selectedspdoc[i];
+                var spdocName = $.grep($scope.SupportingDocument, function (spdoc) {
+                    return spdoc.Id == spdocId;
+                })[0].Title;
+                message += "Value: " + spdocId + " Text: " + spdocName + "\n";
+                supportingFile.push(spdocId);
+            }
+
+            $window.alert(message);
+           
+
+            $scope.Project = {
+                ProjectTitle: $scope.ProjectTitle,
+                ClientName: $scope.ClientName,
+                ClientIndustry: $scope.ClientIndustry,
+                ProjectStatus: $scope.ClientIndustry,
+                ProjectTechnology: $scope.ProjectTechnology,
+                Region: $scope.selectedRegion,
+                SubRegion: $scope.selectedSubRegion,
+            };
+
+            $scope.projectFile = projectFile;
+            $scope.supportingFile = supportingFile;
+
+            $window.alert(supportingFile);
+
+            var Indata = {
+                'Project': $scope.Project,
+                'projectFile': $scope.projectFile,
+                'supportingFile': $scope.supportingFile
+            }
+
+            $http.post('/Project/Create', Indata).then(successUserInfoCallback, errorUserInfoCallback);
+            function successUserInfoCallback(response) {
+                $scope.projectresult = response.data;
+            }
+            function errorUserInfoCallback(error) {
+                console.log(error);
+            }
+
+        }
+
+        $scope.AddProjectFiles = function () {
+
+            var Project = {
+                Title: $scope.Title,
+                ClientName: $scope.ClientName,
+                Industry: $scope.Industry,
+                ProjectStatus: $scope.Industry,
+                Technology: $scope.Technology,
+                Region: $scope.selectedRegion,
+                SubRegion: $scope.selectedSubRegion,
+            };
+
+            $http.post('/Project/Create', Project).then(successUserInfoCallback, errorUserInfoCallback);
+            function successUserInfoCallback(response) {
+                $scope.projectresult = response.data;
+            }
+            function errorUserInfoCallback(error) {
+                console.log(error);
+            }
+
+        }
+
+
+    });
+</script>

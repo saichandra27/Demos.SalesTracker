@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = "UpdateProject";
+}
+
+<div ng-app="salestrackerapp" ng-controller="ProjectController" class="agcontainer">
+    <form novalidate class="simple-form">
+        <h3>Employee Info</h3>
+        @*<div id="employeeinfocontainer" style="margin-left:20px">
+            <div class="row">
+                <div class="col-50-left">
+                    <label>User Name:</label>
+                    <label>{{UserInfo.UserName}}</label>
+                </div>
+                <div class="col-50-right">
+                    <label>Email Id:</label>
+                    <label>{{UserInfo.EmailId}}</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-50-left">
+                    <label>Designation</label>
+                    <label>{{UserInfo.Designation}}</label>
+                </div>
+                <div class="col-50-right">
+                    <label>Department:</label>
+                    <label>{{UserInfo.Department}}</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-50-left">
+                    <label>Reporting Manager:</label>
+                    <label>{{UserInfo.ReportingManager}}</label>
+                </div>
+            </div>
+        </div>*@
+        @Html.Action("UserInfoView", "Project")
+        <hr />
+        <h3> Project Info</h3>
+        <div id="projectinfocontainer" style="margin-left:20px">
+            <div class="row">
+                <div class="col-25">
+                    <label>Project Title:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" ng-model="Project.Title" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label>Project Technology:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" ng-model="Project.Technology" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-25">
+                    <label>Client Name:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" ng-model="Project.ClientName" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label>Client Industry:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" ng-model="Project.Industry" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label>Client Region:</label>
+                </div>
+                <div class="col-75">
+                    <select id="region" ng-options="region.Title for region in Region" ng-model="selectedRegion"></select>
+                    <br>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label>Client Sub Region:</label>
+                </div>
+                <div class="col-75">
+                    <select id="subregion" ng-options="subregion.Title for subregion in SubRegion" ng-model="selectedSubRegion"></select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label>Project Status:</label>
+                </div>
+                <div class="col-75">
+                    <label>
+                        <input name="status" type="radio" ng-model="color.name" ng-value="specialValue">
+                        Open
+                        <input name="status" type="radio" ng-model="color.name" ng-value="specialValue">
+                        Closed
+                    </label>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <h3>Documents Section</h3>
+        <div id="ProjectDocumentsSection" style="margin-left:20px">
+            <div class="row">
+                <label>Project Documents:</label>
+            </div>
+            <div class="row">
+                <div class="col-50-left">
+                    <label>Choose From Existing Documents</label>   <br />
+                    <label>
+                        File Name:
+                        <select ng-model="Project.Industry" ng-options="x.Title for x in ProjectDocument"></select>
+                    </label>
+                    <br />
+                    <b>OR</b>  <br />
+                    <label>Upload Document</label>  <br />
+                    <input type="file" />
+                </div>
+                <div class="col-50-right">
+                    <label>Supporting Documents:</label>
+                    <label>Choose From Existing Documents</label>   <br />
+                    <label>
+                        File Name:
+                        <select ng-model="Project.Industry" ng-options="x.Title for x in SupportingDocument"></select>
+                    </label>
+                    <br />
+                    <b>OR</b>  <br />
+                    <label>Upload Document</label>  <br />
+                    <input type="file" multiple />
+                </div>
+            </div>
+        </div>
+        <div id="submit" style="float:right;clear:both;">
+            <br />    <br /> <br />
+            <div class="row">
+                <input type="submit" ng-click="update(user)" value="Save" />
+                <input type="button" ng-click="reset()" value="Reset" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    var msg = ""; var regionId = 0; var subregionId = 0; var documentid = 0;
+    var salestrackerapp = angular.module('salestrackerapp', []);
+
+    salestrackerapp.controller('ProjectController', function ($scope, $http) {
+        $http.get('/Project/Edit', { params: { 'id': 1 } }).then(successProjectitemsCallback, errorProjectitemsCallback);
+        function successProjectitemsCallback(response) {
+            $scope.Project = response.data;
+            regionId = response.data.Region.Id;
+            subregionId = response.data.SubRegion.Id;
+        }
+        function errorProjectitemsCallback(error) {
+            console.log(error);
+        }
+
+        //$scope.Region = ["Asia", "Africa", "North America", "South America"];
+        //$scope.selectedOption = $scope.Region[1];
+
+        $http.get('/Project/GetRegions').then(successRegionCallback, errorRegionCallback);
+        function successRegionCallback(response) {
+            $scope.Region = response.data;
+            $scope.selectedRegion = $scope.Region[regionId];
+        }
+        function errorRegionCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetSubRegions').then(successSubRegionCallback, errorSubRegionCallback);
+        function successSubRegionCallback(response) {
+            $scope.SubRegion = response.data;
+            $scope.selectedSubRegion = $scope.SubRegion[subregionId];
+        }
+        function errorSubRegionCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetProjectDocument').then(successSubRegionCallback, errorSubRegionCallback);
+        function successSubRegionCallback(response) {
+            $scope.ProjectDocument = response.data;
+            $scope.selectedProjectDocument = $scope.ProjectDocument[documentid];
+        }
+        function errorSubRegionCallback(error) {
+            console.log(error);
+        }
+
+        $http.get('/Project/GetSupportingDocument').then(successSubRegionCallback, errorSubRegionCallback);
+        function successSubRegionCallback(response) {
+            $scope.ProjectDocument = response.data;
+            $scope.selectedProjectDocument = $scope.ProjectDocument[documentid];
+        }
+        function errorSubRegionCallback(error) {
+            console.log(error);
+        }
+    });
+</script>

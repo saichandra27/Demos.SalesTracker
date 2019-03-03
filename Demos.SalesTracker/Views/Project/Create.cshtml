@@ -1,0 +1,86 @@
+﻿@model Demos.SalesTracker.Models.Project
+
+@{
+    ViewBag.Title = "Add Project";
+}
+
+<h2>Add Project</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+
+<div class="form-horizontal agcontainer">
+    <h3>Employee Info</h3>
+    @Html.Action("UserInfoView", "Project")
+    <hr />
+    <h3>Project Info</h3>
+    <div id="projectinfocontainer" style="margin-left:50px">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="row">
+            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "col-25" })
+            <div>
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "col-75" } })
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.Technology, htmlAttributes: new { @class = "col-25" })
+            <div>
+                @Html.EditorFor(model => model.Technology, new { htmlAttributes = new { @class = "col-75" } })
+
+                @Html.ValidationMessageFor(model => model.Technology, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.ClientName, htmlAttributes: new { @class = "col-25" })
+            <div>
+                @Html.EditorFor(model => model.ClientName, new { htmlAttributes = new { @class = "col-75" } })
+                @Html.ValidationMessageFor(model => model.ClientName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.Industry, htmlAttributes: new { @class = "col-25" })
+            <div>
+                @Html.EditorFor(model => model.Industry, new { htmlAttributes = new { @class = "col-75" } })
+                @Html.ValidationMessageFor(model => model.Industry, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.Region, htmlAttributes: new { @class = "col-25" })
+            <div>
+                @Html.DropDownList("Region", ViewBag.Region as SelectList, new { htmlAttributes = new { @class = "col-75" } })
+                @Html.ValidationMessageFor(model => model.Region, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.SubRegion, htmlAttributes: new { @class = "col-25" })
+            <div>
+                @Html.DropDownList("SubRegion", ViewBag.SubRegion as SelectList, new { htmlAttributes = new { @class = "col-75" } })
+                @Html.ValidationMessageFor(model => model.SubRegion, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.ProjectStatus, htmlAttributes: new { @class = "col-25" })
+            <div>
+                @Html.EditorFor(model => model.ProjectStatus, new { htmlAttributes = new { @class = "col-75" } })
+                @Html.ValidationMessageFor(model => model.ProjectStatus, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr />
+    <h3>Project Documents</h3>
+    @Html.Action("FileUpload", "Project")
+    <div class="form-group">
+        <div style="float:right">
+            <input type="submit" value="Create" class="btn btn-default" />
+            <input type="button" value="Cancel" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
